@@ -16,30 +16,30 @@ class DefaultPage extends StatefulWidget {
 
 class _DefaultPageState extends State<DefaultPage> {
 
-  ToolType toolType = ToolType.select;
+  ToolIndex activeTool = ToolIndex.select;
+  late final Map<Type, Action<Intent>> actionsMap;
+
+  @override
+  void initState() {
+    super.initState();
+    actionsMap = buildActionsMap((index){
+      setState(() => activeTool = index);
+    });
+
+  }
 
   @override
   Widget build(BuildContext context) {
 
-
+    
 
     return Shortcuts(
-      shortcuts: shortcuts, 
+      shortcuts: shortcutsMap, 
       child: Actions(
-      actions: {
-          SelectToolIntent: CallbackAction<SelectToolIntent> (onInvoke: (_){
-            
-            setState(() {
-              toolType = ToolType.select;
-            });
-
-            return null;
-          })
-        },
-
+        actions: actionsMap,
         child: Focus(
           autofocus: true,
-          child: _window(toolType)
+          child: _window(activeTool)
         ),
       )
 ,
@@ -47,7 +47,9 @@ class _DefaultPageState extends State<DefaultPage> {
   }
 
 
-  Column _window(ToolType toolType){
+
+  Column _window(ToolIndex activeToo){
+    print("tool type: ${activeTool.name}");
     return Column(
     children: [
       
@@ -57,7 +59,7 @@ class _DefaultPageState extends State<DefaultPage> {
       ),
       
       Expanded(
-        child: CreateCanvas(toolType),
+        child: CreateCanvas(activeTool),
       )
     ],
   );

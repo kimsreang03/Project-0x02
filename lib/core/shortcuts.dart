@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:project_0x02/core/tools/tools.dart';
 
 typedef Set = LogicalKeySet;
 typedef Key = LogicalKeyboardKey;
 
 
-final  Map<LogicalKeySet, Intent> shortcuts = {
+final  Map<LogicalKeySet, Intent> shortcutsMap = {
 
   /// shortcuts start with ctrl
   Set(Key.control, Key.keyS):const SaveIntent(),
@@ -24,46 +25,126 @@ final  Map<LogicalKeySet, Intent> shortcuts = {
 
   
   /// design tools
-  Set(Key.keyS):const SelectToolIntent(),
-  Set(Key.escape):const SelectToolIntent(),
-  Set(Key.keyR): const RectToolIntent(),
-  Set(Key.keyL): const LineToolIntent(),
-  Set(Key.keyP): const PolygonToolIntent(),
-  Set(Key.keyZ): const ZoomToolIntent(),
+  Set(Key.keyS):   const SelectToolIntent(),
+  Set(Key.escape): const SelectToolIntent(),
+  Set(Key.keyZ):   const ZoomToolIntent(),
 
+  Set(Key.keyT):   const TextToolIntent(), // second key for select
+  Set(Key.keyR):   const RectToolIntent(),
+  Set(Key.keyL):   const LineToolIntent(),
+  Set(Key.keyP):   const PolygonToolIntent(),
+  Set(Key.keyE):   const EllipseToolIntent(),
+  Set(Key.keyD):   const ColorPickerToolIntent(),
 
 };
+
+
+Map<Type, Action<Intent>> buildActionsMap(void Function(ToolIndex) setToolIndex){
+
+  return <Type, Action<Intent>>{
+
+    //// actions map for design tools
+    // interaction tools
+    SelectToolIntent: CallbackAction<SelectToolIntent> (onInvoke: (tool){
+      setToolIndex(tool.index);
+      return null;
+    }),
+    ZoomToolIntent: CallbackAction<ZoomToolIntent> (onInvoke: (tool){
+      setToolIndex(tool.index);
+      return null;
+    }),
+    // creating object tools
+    TextToolIntent: CallbackAction<TextToolIntent>(onInvoke: (tool){
+      setToolIndex(tool.index);
+      return null;
+    }),
+    RectToolIntent: CallbackAction<RectToolIntent>(onInvoke: (tool){
+      setToolIndex(tool.index);
+      return null;
+    }),
+    LineToolIntent: CallbackAction<LineToolIntent>(onInvoke: (tool){
+      setToolIndex(tool.index);
+      return null;
+    }),
+    EllipseToolIntent: CallbackAction<EllipseToolIntent>(onInvoke: (tool){
+      setToolIndex(tool.index);
+      return null;
+    }),
+    PolygonToolIntent: CallbackAction<PolygonToolIntent>(onInvoke: (tool){
+      setToolIndex(tool.index);
+      return null;
+    }),
+    ColorPickerToolIntent: CallbackAction<ColorPickerToolIntent>(onInvoke: (tool){
+      setToolIndex(tool.index);
+      return null;
+    }),
+    ////
+
+  };
+}
 
 
 
 ///  basic commands
 ///  mostly in the menu bar
 
-class SaveIntent extends Intent{ const SaveIntent(); }
-class NewIntent extends Intent{ const NewIntent(); }
+class SaveIntent extends Intent{ 
+  const SaveIntent(); 
+}
+class NewIntent extends Intent{
+  const NewIntent(); 
+}
 class UndoIntent extends Intent{ const UndoIntent(); }
 class RedoIntent extends Intent{ const RedoIntent(); }
 class OpenIntent extends Intent{ const OpenIntent(); }
 class ImportIntent extends Intent{ const ImportIntent(); }
 
 
-//// all tools available for designing
-// interaction tools
-class SelectToolIntent extends Intent{ const SelectToolIntent(); }
-class ZoomToolIntent extends Intent{ const ZoomToolIntent(); }
+
 // start with ctrl
 class DuplicateIntent extends Intent{ const DuplicateIntent(); }
 class CopyIntent extends Intent{ const CopyIntent(); }
-class PasteIntent extends Intent{ const PasteIntent(); }
 class CutIntent extends Intent{ const CutIntent(); }
+class PasteIntent extends Intent{ const PasteIntent(); }
+
+//// all tools available for designing
+// interaction tools
+class SelectToolIntent extends Intent{
+  final ToolIndex index = ToolIndex.select;
+  const SelectToolIntent(); 
+}
+class ZoomToolIntent extends Intent{ 
+  final ToolIndex index = ToolIndex.zoom;
+  const ZoomToolIntent(); 
+}
 // object tools
-class LineToolIntent extends Intent{ const LineToolIntent(); }
-class RectToolIntent extends Intent{ const RectToolIntent(); }
-class EllipseToolIntent extends Intent{ const EllipseToolIntent(); }
-class ArcToolIntent extends Intent{ const ArcToolIntent(); }
-class ColorPickerToolIntent extends Intent{ const ColorPickerToolIntent(); }
-class TextToolIntent extends Intent{ const TextToolIntent(); }
-class PolygonToolIntent extends Intent{ const PolygonToolIntent(); }
+class LineToolIntent extends Intent{ 
+  final ToolIndex index = ToolIndex.line;
+  const LineToolIntent(); 
+}
+class RectToolIntent extends Intent{ 
+  final ToolIndex index = ToolIndex.rect;
+  const RectToolIntent(); 
+}
+class EllipseToolIntent extends Intent{ 
+  final ToolIndex index = ToolIndex.elilipse;
+  const EllipseToolIntent(); 
+}
+class ColorPickerToolIntent extends Intent{ 
+  final ToolIndex index = ToolIndex.colorPicker;
+  const ColorPickerToolIntent(); 
+}
+class TextToolIntent extends Intent{ 
+  final ToolIndex index = ToolIndex.text;
+  const TextToolIntent(); 
+}
+class PolygonToolIntent extends Intent{ 
+  final ToolIndex index = ToolIndex.poloygon;
+  const PolygonToolIntent(); 
+}
+///////////////
+
+
 
 /// alignment tools
 // class  extends Intent{ const (); }

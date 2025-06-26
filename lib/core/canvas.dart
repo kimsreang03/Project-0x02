@@ -4,8 +4,8 @@ import 'package:project_0x02/core/tools/tools.dart';
 
 
 class CreateCanvas extends StatefulWidget {
-  final ToolType toolType;
-  const CreateCanvas(this.toolType, {super.key});
+  final ToolIndex tool;
+  const CreateCanvas(this.tool, {super.key});
 
   @override
   State<CreateCanvas> createState() => _CreateCanvasState();
@@ -13,11 +13,13 @@ class CreateCanvas extends StatefulWidget {
 
 class _CreateCanvasState extends State<CreateCanvas> {
 
+  
+
   List<Offset> points = [Offset.zero, Offset.zero];
- 
+
+
   @override
   Widget build(BuildContext context) {
-
     Container canvas = Container(
       width: double.infinity,
       height: double.infinity,
@@ -71,13 +73,19 @@ class _CreateCanvasState extends State<CreateCanvas> {
 
   void _onPointerUp(PointerUpEvent event){
     
-    setState(() {
+    switch(widget.tool){
+      case ToolIndex.select:
+        // TODO: implement selection function
+        setState(() => points = [Offset.zero, Offset.zero]);
+      break;
+      case ToolIndex.rect:
 
-      points = [Offset.zero, Offset.zero];
+      break;
+      
+      default: break;
 
 
-    });
-
+    }
 
   }
 
@@ -96,19 +104,20 @@ class MasterPainter extends CustomPainter{
   MasterPainter(this.points){
     dp = points[1];
   }
+  
 
   @override
   void paint(Canvas canvas, Size size) {
-    
     Paint paint = Paint();
     paint.color = Color(0x2D0078D7);
     paint.style = PaintingStyle.fill;
     // paint.strokeWidth = 3;
     
-
+    
     
     Rect rect = Rect.fromPoints(points[0], points[1]);
-    canvas.drawRect(rect, paint);
+    
+    
 
   }
 

@@ -1,24 +1,56 @@
 
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+
 enum NodeType {group, object, image}
 
+
+/// Node is a generic type that contains all kind of objects in the tree node
+/// including group, shape, images
+/// subclass: ObjectNode, GroupNode 
 abstract class Node{
 
   int index = 0;
   int? id;
   int? parentId;
-  bool visibility = true;
-  bool locked = false;
+  bool isVisible = true;
+  bool islocked = false;
   double opacity = 1;
   final String name;
 
   NodeType get type;
+  Rect boundingBox;
 
-  Node(this.name){
+
+  Node(this.name, this.boundingBox){
     id = Object.hash(name, parentId, hashCode);
   }
 
 
 }
+
+
+/// ObjectShape is the class contains all drawing shape
+/// subclass: LineShape, RectShape, 
+abstract class Shape{
+
+  // TODO: add members
+
+  void draw(Paint paint);
+
+}
+
+class LineShape extends Shape{
+
+  @override
+  void draw(Paint paint) {
+    // TODO: implement draw
+  }
+
+}
+
+
+
 
 class ObjectNode extends Node{
 
@@ -27,7 +59,7 @@ class ObjectNode extends Node{
 
   
 
-  ObjectNode(super.name);
+  ObjectNode(super.name, super.boundingBox);
   
   
   
@@ -41,7 +73,8 @@ class GroupNode extends Node{
 
   List<Node> _children = [];
 
-  GroupNode(super.name, [List<Node>? children]){
+
+  GroupNode(super.name, super.boundingBox, [List<Node>? children]){
     if(children != null) {
 
       for(int i = 0; i < children.length; i++) {
