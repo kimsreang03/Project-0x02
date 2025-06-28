@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_0x02/core/shortcuts.dart';
-import 'package:project_0x02/core/tools/tools.dart';
+import 'package:project_0x02/core/designTools/tools.dart';
 import 'package:project_0x02/ui/menu_bar.dart';
 import 'package:project_0x02/core/canvas.dart';
 
@@ -30,8 +30,6 @@ class _DefaultPageState extends State<DefaultPage> {
 
   @override
   Widget build(BuildContext context) {
-
-    
 
     return Shortcuts(
       shortcuts: shortcutsMap, 

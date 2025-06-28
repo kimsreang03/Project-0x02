@@ -1,8 +1,7 @@
-
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 enum NodeType {group, object, image}
+
 
 
 /// Node is a generic type that contains all kind of objects in the tree node
@@ -28,29 +27,6 @@ abstract class Node{
 
 
 }
-
-
-/// ObjectShape is the class contains all drawing shape
-/// subclass: LineShape, RectShape, 
-abstract class Shape{
-
-  // TODO: add members
-
-  void draw(Paint paint);
-
-}
-
-class LineShape extends Shape{
-
-  @override
-  void draw(Paint paint) {
-    // TODO: implement draw
-  }
-
-}
-
-
-
 
 class ObjectNode extends Node{
 

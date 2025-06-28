@@ -1,10 +1,16 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:project_0x02/core/tools/tools.dart';
+import 'package:project_0x02/core/designTools/tools.dart';
 
 typedef Set = LogicalKeySet;
 typedef Key = LogicalKeyboardKey;
 
+class ModifierKeys{
+  bool shift = false;
+  bool ctrl = false;
+  bool alt = false;
+}
 
 final  Map<LogicalKeySet, Intent> shortcutsMap = {
 
@@ -117,6 +123,7 @@ class ZoomToolIntent extends Intent{
   final ToolIndex index = ToolIndex.zoom;
   const ZoomToolIntent(); 
 }
+
 // object tools
 class LineToolIntent extends Intent{ 
   final ToolIndex index = ToolIndex.line;
