@@ -1,24 +1,37 @@
 <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg">
   
-  <path
-    d="
-      M 100 50
-      A 2 1 0 1 0 100 150
-      A 2 1 0 1 0 100 50
-    "
-    fill="none"
-    stroke="black"
-  />
+  Move to (M), Line to (L), Close path (Z)
+<!-- <path d="M 10 10 L 100 10 L 100 100 L 10 100 Z" /> -->
 
-  <!-- <path
-    d="
-      M 100 50
-      A 50 50 0 1 0 100 150
-      A 50 50 0 1 0 100 50
-    "
-    fill="none"
-    stroke="black"
-  /> -->
+<!-- Horizontal (H) and Vertical (V) lines -->
+<!-- <path d="M 50 50 H 150 V 150 H 50 Z" /> -->
+
+<!-- Cubic Bézier Curve (C) -->
+<!-- <path d="M 10 80 C 40 10, 65 10, 95 80" /> -->
+
+<!-- Smooth Cubic Bézier Curve (S) -->
+<!-- <path d="M 10 80 C 40 10, 65 10, 95 80 S 150 150, 180 80" /> -->
+
+<!-- Quadratic Bézier Curve (Q) -->
+<!-- <path d="M 10 80 Q 95 10, 180 80" /> -->
+
+<!-- Smooth Quadratic Bézier Curve (T) -->
+<!-- <path d="M 10 80 Q 95 10, 180 80 T 300 80" /> -->
+
+<!-- Arc (A) -->
+<!-- <path d="M 100 100 A 1 0.8 45 0 1 200 100" /> -->
+<!-- <path d="M 100 100 A 45 45 0 1 1 200 100" /> -->
+
+<!-- short arc -->
+<!-- <path d="M 100 100 A 50 50 0 0 1 150 150" /> -->
+
+
+<!-- long arc (same points, different flag) -->
+<path d="M 100 100   A 26 26 0 1 1 100 150" />
+<path d="M 100 100 H 98 V 120 H 100 Z" fill="blue"/>
+
+ <circle r="1" cx="100" cy="100" fill="red" />
+ <circle r="1" cx="100" cy="150" fill="red" />
 
 
 </svg>

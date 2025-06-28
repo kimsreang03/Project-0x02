@@ -17,6 +17,9 @@ class DefaultPage extends StatefulWidget {
 
 class _DefaultPageState extends State<DefaultPage> {
 
+  
+
+  
   late final Map<Type, Action<Intent>> actionsMap;
 
   late final List<ShapeObject> shapes;
@@ -24,7 +27,6 @@ class _DefaultPageState extends State<DefaultPage> {
 
   @override
   void initState() {
-
     shapes =
     [
       ShapeObject(
@@ -64,6 +66,8 @@ class _DefaultPageState extends State<DefaultPage> {
 
   Column _window(){
     print("tool type: ${newShape.activeTool.name}");
+    __setting();
+
     return Column(
     children: [
       
@@ -78,4 +82,19 @@ class _DefaultPageState extends State<DefaultPage> {
     ],
   );
   }
+
+  void __setting(){
+    newShape.color = Colors.black;
+    newShape.paintingStyle = PaintingStyle.fill;
+    
+    if(newShape.activeTool == ToolIndex.line || newShape.activeTool == ToolIndex.select){
+      newShape.paintingStyle = PaintingStyle.stroke;
+      if(newShape.activeTool == ToolIndex.select){
+        newShape.color = Color(0x8033A1FD);
+      }
+    }
+    
+  }
+
+
 }

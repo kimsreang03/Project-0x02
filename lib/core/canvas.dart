@@ -29,7 +29,6 @@ class _CreateCanvasState extends State<CreateCanvas> {
   late final NewShapeObject newShape;
   
 
-
   @override
   void initState() {
     newShape = widget.newShape;
@@ -117,7 +116,6 @@ class _CreateCanvasState extends State<CreateCanvas> {
       case kPrimaryMouseButton:
         setState(() {
           newShape.points[0] = event.localPosition;
-          newShape.pointerUp = false;
         });
       break;
       case kMiddleMouseButton:
@@ -133,7 +131,6 @@ class _CreateCanvasState extends State<CreateCanvas> {
     if(event.buttons == kPrimaryMouseButton){
       setState(() {
         newShape.points[1] = event.localPosition;
-        // print(points);
       });
 
     }
@@ -143,13 +140,27 @@ class _CreateCanvasState extends State<CreateCanvas> {
     
     // set points back to the zero position
     setState((){
-      newShape.pointerUp = true;
-      if(newShape.activeTool == ToolIndex.select){
-        newShape.points[0] = Offset.zero;
-        newShape.points[1] = Offset.zero;
+      if(newShape.activeTool != ToolIndex.select){
+        updatePaintingList();
       }
+      newShape.points[0] = Offset.zero;
+      newShape.points[1] = Offset.zero;
     });
 
+  }
+
+
+  void updatePaintingList(){
+    // add the drawn shape to the shapes[] list
+      widget.shapes.add(ShapeObject(
+        pathData: newShape.pathData,
+        color: newShape.color,
+        paintingStyle: newShape.paintingStyle,
+        strokeWidth: newShape.strokeWidth,
+        strokeCap: newShape.strokeCap,
+        strokeJoin: newShape.strokeJoin,
+        strokeStyle: newShape.strokeStyle,
+      ));
   }
 
 }
@@ -163,6 +174,7 @@ class _CreateCanvasState extends State<CreateCanvas> {
 
 class MasterPainter extends CustomPainter{
 
+  static int i = 1;
 
   List<ShapeObject> shapes;
   NewShapeObject newShape;/// painting data
@@ -182,34 +194,7 @@ class MasterPainter extends CustomPainter{
       shapes[i].draw(canvas, paint);
     }
 
-    if(newShape.activeTool == ToolIndex.select){
-      newShape.color = Color(0x8033A1FD);
-      newShape.style = PaintingStyle.stroke;
-    }else {newShape.reset();}
-
     newShape.draw(canvas, paint);
-    if(newShape.pointerUp && newShape.activeTool != ToolIndex.select){
-      // add the drawn shape to the shapes[] list
-      shapes.add(ShapeObject(
-        pathData: newShape.pathData,
-        color: newShape.color,
-        style: newShape.style,
-        strokeWidth: newShape.strokeWidth,
-        strokeCap: newShape.strokeCap,
-        strokeJoin: newShape.strokeJoin,
-        strokeStyle: newShape.strokeStyle,
-      ));
-      for(int i = 0; i < shapes.length; i++){
-        debugPrint(" ${shapes[i].pathData}");
-      }
-      newShape.reset();
-      newShape.points[0] = Offset.zero;
-      newShape.points[1] = Offset.zero;
-      // TODO: fix the bug
-      
-    }
-    
-
   }
 
   @override

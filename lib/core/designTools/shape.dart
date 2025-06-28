@@ -14,7 +14,7 @@ class ShapeObject{
   String pathData;
 
   Color color;
-  PaintingStyle style;
+  PaintingStyle paintingStyle;
   double strokeWidth;
   StrokeCap strokeCap;
   StrokeJoin strokeJoin;
@@ -25,7 +25,7 @@ class ShapeObject{
     {
       this.pathData = "",
       this.color = Colors.black,
-      this.style = PaintingStyle.fill,
+      this.paintingStyle = PaintingStyle.fill,
       this.strokeWidth = 2,
       this.strokeCap = StrokeCap.butt,
       this.strokeJoin = StrokeJoin.bevel,
@@ -38,7 +38,7 @@ class ShapeObject{
   void draw(Canvas canvas, Paint paint){
     
     paint.color = color;
-    paint.style = style;
+    paint.style = paintingStyle;
     paint.strokeWidth = strokeWidth;
     paint.strokeCap = strokeCap;
     paint.strokeJoin = strokeJoin;
@@ -56,27 +56,27 @@ class NewShapeObject extends ShapeObject{
   final List<Offset> points = [Offset.zero, Offset.zero];
   ShapeObject newShape = ShapeObject();
   ToolIndex activeTool = ToolIndex.select;
-  bool pointerUp = false;
+  // bool painting = false;
 
 
   @override
   void draw(Canvas canvas, Paint paint) {
   
-    pathData = pathData = _getBasicPath(points[0], points[1], modifierKeys.ctrl);
+    pathData = _getBasicPath(points[0], points[1], modifierKeys.ctrl);
 
     super.draw(canvas, paint);
   }
 
-  void reset(){
-    pathData = "";
-    color = Colors.black;
-    style = PaintingStyle.fill;
-    strokeWidth = 2;
-    strokeCap = StrokeCap.butt;
-    strokeJoin = StrokeJoin.bevel;
-    strokeStyle = StrokeStyle.solid;
+  // void reset(){
+  //   pathData = "";
+  //   color = Colors.black;
+  //   paintingStyle = PaintingStyle.fill;
+  //   strokeWidth = 2;
+  //   strokeCap = StrokeCap.butt;
+  //   strokeJoin = StrokeJoin.bevel;
+  //   strokeStyle = StrokeStyle.solid;
     
-  }
+  // }
   
 
 
@@ -95,6 +95,7 @@ class NewShapeObject extends ShapeObject{
 
     switch(activeTool){
       case ToolIndex.line:
+        paintingStyle = PaintingStyle.stroke;
         return  'M $x1 $y1 L $x2 $y2';
       case ToolIndex.rect: case ToolIndex.select:
         return 'M $x1 $y1 H $x2 V $y2 H $x1 Z';
