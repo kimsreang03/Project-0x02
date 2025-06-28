@@ -1,10 +1,9 @@
 import "package:flutter/material.dart";
 import 'package:path_drawing/path_drawing.dart';
+import 'package:project_0x02/core/designTools/tools.dart';
+import 'package:project_0x02/core/shortcuts.dart';
 
 enum StrokeStyle {solid, dash, ovalDash}
-enum ShapeType{
-  line, rect
-}
 
 
 
@@ -13,7 +12,6 @@ enum ShapeType{
 class ShapeObject{
 
   String pathData;
-  ShapeType shapeType;
 
   Color color;
   PaintingStyle style;
@@ -23,9 +21,9 @@ class ShapeObject{
   StrokeStyle strokeStyle;
 
 
-  ShapeObject( this.pathData,
+  ShapeObject(
     {
-      this.shapeType = ShapeType.rect,
+      this.pathData = "",
       this.color = Colors.black,
       this.style = PaintingStyle.fill,
       this.strokeWidth = 2,
@@ -52,27 +50,37 @@ class ShapeObject{
 
 }
 
+class NewShapeObject extends ShapeObject{
+
+  final ModifierKeys modifierKeys = ModifierKeys();
+  final List<Offset> points = [Offset.zero, Offset.zero];
+  ShapeObject newShape = ShapeObject();
+  ToolIndex activeTool = ToolIndex.select;
+  bool pointerUp = false;
 
 
+  @override
+  void draw(Canvas canvas, Paint paint) {
+  
+    pathData = pathData = _getBasicPath(points[0], points[1], modifierKeys.ctrl);
 
-class ShapePath{
-
-  static String basic(List<Offset> points, ShapeType type, bool drawFromCenter){
-
-    
-
-    switch(type){
-      
-      case ShapeType.line:
-        return _getLinePath(points[0], points[1], drawFromCenter);
-      case ShapeType.rect:
-        return _getRectPath(points[0], points[1], drawFromCenter);   
-    }
-
+    super.draw(canvas, paint);
   }
 
-  static String _getLinePath(Offset p1, Offset p2, bool drawFromCenter){
+  void reset(){
+    pathData = "";
+    color = Colors.black;
+    style = PaintingStyle.fill;
+    strokeWidth = 2;
+    strokeCap = StrokeCap.butt;
+    strokeJoin = StrokeJoin.bevel;
+    strokeStyle = StrokeStyle.solid;
     
+  }
+  
+
+
+  String _getBasicPath(Offset p1, Offset p2, bool drawFromCenter){
     double x1, x2, y1, y2;
 
     if(drawFromCenter){
@@ -84,29 +92,18 @@ class ShapePath{
       x1 = p1.dx; y1 = p1.dy; 
       x2 = p2.dx; y2 = p2.dy;
     }
-    
-    return  'M $x1 $y1 L $x2 $y2';
-  }
 
-  static String _getRectPath(Offset p1, Offset p2, bool drawFromCenter){
-    double x1, x2, y1, y2;
-    
-    if(drawFromCenter){
-      x1 = 2*p1.dx - p2.dx;
-      y1 = 2*p1.dy - p2.dy;
-      x2 = p2.dx;
-      y2 = p2.dy;  
-     
-    }else{
-      x1 = p1.dx; y1 = p1.dy; 
-      x2 = p2.dx; y2 = p2.dy;
+    switch(activeTool){
+      case ToolIndex.line:
+        return  'M $x1 $y1 L $x2 $y2';
+      case ToolIndex.rect: case ToolIndex.select:
+        return 'M $x1 $y1 H $x2 V $y2 H $x1 Z';
+      default: return "";
     }
 
-     return 'M $x1 $y1 '
-            'H $x2 V $y2 '
-            'H $x1 Z';
   }
 
+  
 
+}
 
-} // ShapePath

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:project_0x02/core/shortcuts.dart';
+import 'package:project_0x02/core/designTools/shape.dart';
 import 'package:project_0x02/core/designTools/tools.dart';
+import 'package:project_0x02/core/shortcuts.dart';
 import 'package:project_0x02/ui/menu_bar.dart';
 import 'package:project_0x02/core/canvas.dart';
 
@@ -16,14 +17,29 @@ class DefaultPage extends StatefulWidget {
 
 class _DefaultPageState extends State<DefaultPage> {
 
-  ToolIndex activeTool = ToolIndex.select;
   late final Map<Type, Action<Intent>> actionsMap;
+
+  late final List<ShapeObject> shapes;
+  final NewShapeObject newShape = NewShapeObject();
 
   @override
   void initState() {
+
+    shapes =
+    [
+      ShapeObject(
+        pathData: "M10 10 H110 V70 H10 Z",
+        color: Color(0xffff0000),
+      ),
+      ShapeObject(
+        pathData: "M60 20 L100 100 L20 100 Z",
+        
+      ),
+    ];
+
     super.initState();
     actionsMap = buildActionsMap((index){
-      setState(() => activeTool = index);
+      setState(() => newShape.activeTool = index);
     });
 
   }
@@ -37,7 +53,7 @@ class _DefaultPageState extends State<DefaultPage> {
         actions: actionsMap,
         child: Focus(
           autofocus: true,
-          child: _window(activeTool)
+          child: _window()
         ),
       )
 ,
@@ -46,8 +62,8 @@ class _DefaultPageState extends State<DefaultPage> {
 
 
 
-  Column _window(ToolIndex activeToo){
-    print("tool type: ${activeTool.name}");
+  Column _window(){
+    print("tool type: ${newShape.activeTool.name}");
     return Column(
     children: [
       
@@ -57,7 +73,7 @@ class _DefaultPageState extends State<DefaultPage> {
       ),
       
       Expanded(
-        child: CreateCanvas(activeTool),
+        child: CreateCanvas(shapes, newShape),
       )
     ],
   );

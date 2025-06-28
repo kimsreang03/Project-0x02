@@ -5,25 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:project_0x02/core/designTools/shape.dart';
 import 'package:project_0x02/core/designTools/tools.dart';
-import 'package:project_0x02/core/shortcuts.dart';
-
 
 /// this class is just to simplify the constructor parameters of MasterPaiter
 /// it contains the existing shapes needed to be rendered
 /// and the data for new drawing
-class PaintingData{
-  List<ShapeObject> shapes = [];
-  final ModifierKeys modifierKeys = ModifierKeys();
-  final List<Offset> points = [Offset.zero, Offset.zero];
-  ShapeObject newShape = ShapeObject("");
-}
 
 
 /// 
 /// 
 class CreateCanvas extends StatefulWidget {
-  final ToolIndex tool;
-  const CreateCanvas(this.tool, {super.key});
+  final List<ShapeObject> shapes;
+  final NewShapeObject newShape;
+  const CreateCanvas(this.shapes, this.newShape, {super.key});
 
   @override
   State<CreateCanvas> createState() => _CreateCanvasState();
@@ -33,11 +26,13 @@ class _CreateCanvasState extends State<CreateCanvas> {
 
 
   final FocusNode _focusNode = FocusNode();
+  late final NewShapeObject newShape;
+  
 
-  PaintingData paintingData = PaintingData();
 
   @override
   void initState() {
+    newShape = widget.newShape;
     super.initState();
     _focusNode.requestFocus();
   }
@@ -60,7 +55,7 @@ class _CreateCanvasState extends State<CreateCanvas> {
         onPointerMove: _onPointerMove,
         
         child: CustomPaint(
-          painter: MasterPainter(paintingData),
+          painter: MasterPainter(widget.shapes, newShape),
           size: Size.infinite
         ),
 
@@ -102,15 +97,15 @@ class _CreateCanvasState extends State<CreateCanvas> {
     switch(key){
       case LogicalKeyboardKey.controlLeft:
       case LogicalKeyboardKey.controlRight:
-        setState(() => paintingData.modifierKeys.ctrl = value);
+        setState(() => newShape.modifierKeys.ctrl = value);
       break;
       case LogicalKeyboardKey.shiftLeft:
       case LogicalKeyboardKey.shiftRight:
-        setState(() => paintingData.modifierKeys.shift = value);
+        setState(() => newShape.modifierKeys.shift = value);
       break;
       case LogicalKeyboardKey.altLeft:
       case LogicalKeyboardKey.altRight:
-        setState(() => paintingData.modifierKeys.alt = value);
+        setState(() => newShape.modifierKeys.alt = value);
     }
   }
 
@@ -121,7 +116,8 @@ class _CreateCanvasState extends State<CreateCanvas> {
     switch(event.buttons){
       case kPrimaryMouseButton:
         setState(() {
-          paintingData.points[0] = event.localPosition;
+          newShape.points[0] = event.localPosition;
+          newShape.pointerUp = false;
         });
       break;
       case kMiddleMouseButton:
@@ -136,8 +132,7 @@ class _CreateCanvasState extends State<CreateCanvas> {
   void _onPointerMove(PointerMoveEvent event){
     if(event.buttons == kPrimaryMouseButton){
       setState(() {
-
-        paintingData.points[1] = event.localPosition;
+        newShape.points[1] = event.localPosition;
         // print(points);
       });
 
@@ -146,22 +141,14 @@ class _CreateCanvasState extends State<CreateCanvas> {
 
   void _onPointerUp(PointerUpEvent event){
     
-    switch(widget.tool){
-      case ToolIndex.select:
-        // TODO: implement selection function
-        setState((){
-          paintingData.points[0] = Offset.zero;
-          paintingData.points[1] = Offset.zero;
-        });
-      break;
-      case ToolIndex.rect:
-
-      break;
-      
-      default: break;
-
-
-    }
+    // set points back to the zero position
+    setState((){
+      newShape.pointerUp = true;
+      if(newShape.activeTool == ToolIndex.select){
+        newShape.points[0] = Offset.zero;
+        newShape.points[1] = Offset.zero;
+      }
+    });
 
   }
 
@@ -176,40 +163,58 @@ class _CreateCanvasState extends State<CreateCanvas> {
 
 class MasterPainter extends CustomPainter{
 
-  PaintingData paintingData; /// painting data
 
-  List<Offset> p = [];
-  List<ShapeObject> shapes = [];
-  ModifierKeys modifierKeys = ModifierKeys();
-  ShapeObject newShape = ShapeObject("");
+  List<ShapeObject> shapes;
+  NewShapeObject newShape;/// painting data
+  
+  Offset? dp;
 
-  MasterPainter(this.paintingData){
-    p = paintingData.points;
-    shapes = paintingData.shapes;
-    modifierKeys = paintingData.modifierKeys;
-    newShape = paintingData.newShape;
+  MasterPainter(this.shapes, this.newShape){
+    dp = newShape.points[1];
   }
   
-
-
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint();
 
-    // draw all existed shapes
+    //draw all existed shapes
     for(int i = 0; i < shapes.length; i++){
       shapes[i].draw(canvas, paint);
     }
 
-    //// draw new shape
-    
+    if(newShape.activeTool == ToolIndex.select){
+      newShape.color = Color(0x8033A1FD);
+      newShape.style = PaintingStyle.stroke;
+    }else {newShape.reset();}
+
+    newShape.draw(canvas, paint);
+    if(newShape.pointerUp && newShape.activeTool != ToolIndex.select){
+      // add the drawn shape to the shapes[] list
+      shapes.add(ShapeObject(
+        pathData: newShape.pathData,
+        color: newShape.color,
+        style: newShape.style,
+        strokeWidth: newShape.strokeWidth,
+        strokeCap: newShape.strokeCap,
+        strokeJoin: newShape.strokeJoin,
+        strokeStyle: newShape.strokeStyle,
+      ));
+      for(int i = 0; i < shapes.length; i++){
+        debugPrint(" ${shapes[i].pathData}");
+      }
+      newShape.reset();
+      newShape.points[0] = Offset.zero;
+      newShape.points[1] = Offset.zero;
+      // TODO: fix the bug
+      
+    }
     
 
   }
 
   @override
   bool shouldRepaint(covariant MasterPainter oldDelegate) {
-    return oldDelegate.p[1] != p[1];   
+    return oldDelegate.dp != dp;   
   }
 
 }
