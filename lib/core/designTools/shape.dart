@@ -11,8 +11,53 @@ enum StrokeStyle {solid, dash, ovalDash}
 /// subclass: LineShape, RectShape, 
 class ShapeObject{
 
-  String pathData;
+  Path path = Path();
+  Color color;
+  PaintingStyle paintingStyle;
+  double strokeWidth;
+  StrokeCap strokeCap;
+  StrokeJoin strokeJoin;
+  StrokeStyle strokeStyle;
+  late String _pathData;
 
+  String get pathData => _pathData;
+  set pathData(String value){
+    _pathData = value;
+    path = parseSvgPathData(_pathData);
+  }
+
+  ShapeObject(
+    { 
+      String pathData = "",
+      this.color = Colors.black,
+      this.paintingStyle = PaintingStyle.fill,
+      this.strokeWidth = 2,
+      this.strokeCap = StrokeCap.butt,
+      this.strokeJoin = StrokeJoin.bevel,
+      this.strokeStyle = StrokeStyle.solid,
+    }
+  ){
+    this.pathData = pathData;
+  }
+
+  void paint(Canvas canvas, Paint paint, Offset pointer){
+    
+    paint.color = color;
+    paint.style = paintingStyle;
+    paint.strokeWidth = strokeWidth;
+    paint.strokeCap = strokeCap;
+    paint.strokeJoin = strokeJoin;
+    //TODO: implement more features here
+    canvas.drawPath(path, paint);
+  }
+
+  
+
+}
+
+class NewShapeObject{
+
+  String pathData;
   Color color;
   PaintingStyle paintingStyle;
   double strokeWidth;
@@ -21,7 +66,9 @@ class ShapeObject{
   StrokeStyle strokeStyle;
 
 
-  ShapeObject(
+  bool _drawFromCenter = false;
+
+  NewShapeObject(
     {
       this.pathData = "",
       this.color = Colors.black,
@@ -32,39 +79,26 @@ class ShapeObject{
       this.strokeStyle = StrokeStyle.solid,
     }
   ){
-    print("ShapeObject created");
+    print("NewShapeObject created");
   }
 
-  void draw(Canvas canvas, Paint paint){
-    
+
+
+
+  
+  void paint(Canvas canvas, Paint paint, List<Offset> pointer, LeaderKeys leaderKey, ToolIndex tool) {
+    _drawFromCenter = leaderKey.ctrl;
+
+    pathData = _getBasicPath(pointer[0], pointer[1], tool);
+
+    Path path = parseSvgPathData(pathData);
     paint.color = color;
     paint.style = paintingStyle;
     paint.strokeWidth = strokeWidth;
     paint.strokeCap = strokeCap;
     paint.strokeJoin = strokeJoin;
-    
-    Path path = parseSvgPathData(pathData);
-
     canvas.drawPath(path, paint);
-  }
-
-}
-
-class NewShapeObject extends ShapeObject{
-
-  final ModifierKeys modifierKeys = ModifierKeys();
-  final List<Offset> points = [Offset.zero, Offset.zero];
-  ShapeObject newShape = ShapeObject();
-  ToolIndex activeTool = ToolIndex.select;
-  // bool painting = false;
-
-
-  @override
-  void draw(Canvas canvas, Paint paint) {
   
-    pathData = _getBasicPath(points[0], points[1], modifierKeys.ctrl);
-
-    super.draw(canvas, paint);
   }
 
   // void reset(){
@@ -77,13 +111,11 @@ class NewShapeObject extends ShapeObject{
   //   strokeStyle = StrokeStyle.solid;
     
   // }
-  
 
-
-  String _getBasicPath(Offset p1, Offset p2, bool drawFromCenter){
+  String _getBasicPath(Offset p1, Offset p2, ToolIndex tool){
     double x1, x2, y1, y2;
 
-    if(drawFromCenter){
+    if(_drawFromCenter){
       x1 = 2*p1.dx - p2.dx;
       y1 = 2*p1.dy - p2.dy;
       x2 = p2.dx;
@@ -93,7 +125,8 @@ class NewShapeObject extends ShapeObject{
       x2 = p2.dx; y2 = p2.dy;
     }
 
-    switch(activeTool){
+
+    switch(tool){
       case ToolIndex.line:
         paintingStyle = PaintingStyle.stroke;
         return  'M $x1 $y1 L $x2 $y2';
@@ -101,6 +134,7 @@ class NewShapeObject extends ShapeObject{
         return 'M $x1 $y1 H $x2 V $y2 H $x1 Z';
       default: return "";
     }
+
 
   }
 

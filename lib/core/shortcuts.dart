@@ -6,10 +6,11 @@ import 'package:project_0x02/core/designTools/tools.dart';
 typedef Set = LogicalKeySet;
 typedef Key = LogicalKeyboardKey;
 
-class ModifierKeys{
+class LeaderKeys{
   bool shift = false;
   bool ctrl = false;
   bool alt = false;
+  bool space = false;
 }
 
 final  Map<LogicalKeySet, Intent> shortcutsMap = {

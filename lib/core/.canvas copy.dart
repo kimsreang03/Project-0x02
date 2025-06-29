@@ -1,43 +1,27 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:project_0x02/core/designTools/shape.dart';
 import 'package:project_0x02/core/designTools/tools.dart';
 import 'package:project_0x02/core/shortcuts.dart';
 
 
-  // shapes =
-    // [
-    //   ShapeObject(
-    //     pathData: "M10 10 H110 V70 H10 Z",
-    //     color: Color(0xffff0000),
-    //   ),
-    //   ShapeObject(
-    //     pathData: "M60 20 L100 100 L20 100 Z",
-        
-    //   ),
-    // ];
-
-
-class Transformation{
+class TransformObject{
   Offset pan;
   double scale;
-  Transformation({
+  TransformObject({
     this.pan = Offset.zero,
     this.scale = 1,
   });
 }
 
 
-
 /// 
 /// 
 class CreateCanvas extends StatefulWidget {
-  final ToolIndex activeTool;
-  CreateCanvas(this.activeTool, {super.key}){
-    print("0: $activeTool");
-  }
+  final List<ShapeObject> shapes;
+  final NewShapeObject newShape;
+  const CreateCanvas(this.shapes, this.newShape, {super.key});
 
   @override
   State<CreateCanvas> createState() => _CreateCanvasState();
@@ -45,20 +29,16 @@ class CreateCanvas extends StatefulWidget {
 
 class _CreateCanvasState extends State<CreateCanvas> {
 
-  final List<ShapeObject> shapes = [];
-  final NewShapeObject newShape = NewShapeObject();
-  final LeaderKeys leaderKeys = LeaderKeys();
-  final Transformation transform = Transformation();
-  final List<Offset> pointer = [Offset.zero, Offset.zero];
 
   final FocusNode _focusNode = FocusNode();
+  late final NewShapeObject newShape;
+  final ModifierKeys modifierKeys = ModifierKeys();
+  TransformObject transform = TransformObject();
   
-  // _CreateCanvasState(){
-  //   activeTool = widget.activeTool;
-  // }
 
   @override
   void initState() {
+    newShape = widget.newShape;
     super.initState();
     _focusNode.requestFocus();
   }
@@ -87,7 +67,7 @@ class _CreateCanvasState extends State<CreateCanvas> {
 
 
         child: CustomPaint(
-          painter: MasterPainter(shapes, newShape, pointer, widget.activeTool, leaderKeys, transform),
+          painter: MasterPainter(widget.shapes, newShape, transform, modifierKeys),
           size: Size.infinite
         ),
 
@@ -112,7 +92,7 @@ class _CreateCanvasState extends State<CreateCanvas> {
   /// methods of MouseRegion
   /// change mouse cursor for different design tools
   MouseCursor _handleMouseCursor(){
-    if(widget.activeTool == ToolIndex.select){
+    if(newShape.activeTool == ToolIndex.select){
       return SystemMouseCursors.move;
     }
     return SystemMouseCursors.precise;
@@ -126,32 +106,32 @@ class _CreateCanvasState extends State<CreateCanvas> {
   void _onKeyEvent(KeyEvent event){
 
     if(event is KeyDownEvent){
-      _setLeaderKeys(event.logicalKey, true);
+      _setModifierKeys(event.logicalKey, true);
     }else
     if(event is KeyUpEvent){
-      _setLeaderKeys(event.logicalKey, false);
+      _setModifierKeys(event.logicalKey, false);
     }
 
   }
   /// scaning for the the keys ctrl, shift, alt
   /// if they were pressed/released, set them true/false in the modifierKeys
-  void _setLeaderKeys(LogicalKeyboardKey key, bool value){
+  void _setModifierKeys(LogicalKeyboardKey key, bool value){
     switch(key){
       case LogicalKeyboardKey.controlLeft:
       case LogicalKeyboardKey.controlRight:
-        setState(() => leaderKeys.ctrl = value);
+        setState(() => modifierKeys.ctrl = value);
       break;
       case LogicalKeyboardKey.shiftLeft:
       case LogicalKeyboardKey.shiftRight:
-        setState(() => leaderKeys.shift = value);
+        setState(() => modifierKeys.shift = value);
       break;
       case LogicalKeyboardKey.altLeft:
       case LogicalKeyboardKey.altRight:
-        setState(() => leaderKeys.alt = value);
+        setState(() => modifierKeys.alt = value);
       case LogicalKeyboardKey.space:
-        setState(() => leaderKeys.space = value);
+        setState(() => modifierKeys.space = value);
     }
-  } // _setLeaderKeys
+  }
 
   
 
@@ -160,7 +140,9 @@ class _CreateCanvasState extends State<CreateCanvas> {
     switch(event.buttons){
       case kPrimaryMouseButton:
         setState(() {
-          pointer[0] = (event.localPosition - transform.pan)/transform.scale;
+          // newShape.points[0] = event.localPosition - transform.pan;
+        newShape.points[0] = event.localPosition;
+
         });
       break;
       case kMiddleMouseButton:
@@ -175,25 +157,29 @@ class _CreateCanvasState extends State<CreateCanvas> {
   void _onPointerMove(PointerMoveEvent event){
     if(event.buttons == kPrimaryMouseButton){
       setState(() {
-        pointer[1] = (event.localPosition - transform.pan)/transform.scale;
+        // newShape.points[1] = event.localPosition - transform.pan;
+        newShape.points[1] = event.localPosition;
       });
 
     }
   } // _onPointerMove
 
   void _onPointerUp(PointerUpEvent event){
+    
+    // set points back to the zero position
     setState((){
-      if (widget.activeTool == ToolIndex.rect ||
-          widget.activeTool == ToolIndex.line){
-        addNewShape(shapes, newShape);
+      if(newShape.activeTool != ToolIndex.select){
+
+        updatePaintingList();
       }
-      pointer[1] = pointer[0];
+      newShape.points[0] = Offset.zero;
+      newShape.points[1] = Offset.zero;
     });
 
   } // _onPointerUp
 
   void _onPointerHover(PointerHoverEvent event){
-    if(leaderKeys.space){
+    if(modifierKeys.space){
       setState(() {
         transform.pan += event.localDelta;
       });
@@ -203,18 +189,17 @@ class _CreateCanvasState extends State<CreateCanvas> {
 
   void _onPointerSignal(PointerSignalEvent event){
     if(event is PointerScrollEvent){
-      if(leaderKeys.ctrl){
+      if(modifierKeys.ctrl){
         setState(() {
-          transform.scale += event.scrollDelta.dy/200;
-          transform.scale = transform.scale.clamp(0.1, 10);        
+          transform.scale += event.scrollDelta.dy/153;
+          transform.scale = transform.scale.clamp(0.1, 10);
+        
         });
       }
     }
   } // _onPointerSignal
 
-/////////////////////////////
-/////////////////////////
-///TODO: future implementation
+
   void _onPointerPanZoomStart(PointerPanZoomStartEvent event){
     //TODO
     setState(() {
@@ -237,14 +222,16 @@ class _CreateCanvasState extends State<CreateCanvas> {
       
     });
   }
-///////////////////////////////////////
+
 //////////////////////////////////////
 
-  void addNewShape(List<ShapeObject> shapes, NewShapeObject newShape){
-
-    
-    shapes.add(ShapeObject(
-      pathData: newShape.pathData,
+  void updatePaintingList(){
+    // add the drawn shape to the shapes[] list
+    Offset p1 = (newShape.points[0] - transform.pan)/transform.scale;
+    Offset p2 = (newShape.points[1] - transform.pan)/transform.scale;
+    widget.shapes.add(ShapeObject(
+      pathData: newShape.getBasicPath(p1, p2, modifierKeys.ctrl),
+      // pathData: newShape.pathData,
       color: newShape.color,
       paintingStyle: newShape.paintingStyle,
       strokeWidth: newShape.strokeWidth,
@@ -265,57 +252,46 @@ class _CreateCanvasState extends State<CreateCanvas> {
 
 class MasterPainter extends CustomPainter{
 
+  static int i = 1;
 
-  List<Offset> pointer;
   List<ShapeObject> shapes;
   NewShapeObject newShape;/// painting data
-  Transformation transform;
-  LeaderKeys leaderKeys;
-  ToolIndex activeTool;
-
+  TransformObject transform;
+  ModifierKeys modifierKeys;
+  
   Offset? r1, r2;
   double? r3;
   bool? r4;
 
-  MasterPainter(
-    this.shapes, 
-    this.newShape, 
-    this.pointer,
-    this.activeTool,
-    this.leaderKeys,
-    this.transform,)
-  {
-    r1 = pointer[1];
+  MasterPainter(this.shapes, this.newShape, this.transform, this.modifierKeys){
+    r1 = newShape.points[1];
     r2 = transform.pan;
     r3 = transform.scale;
-    r4 = leaderKeys.ctrl;
+    r4 = modifierKeys.ctrl;
   }
   
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint();
 
+    canvas.save();
+
     canvas.translate(transform.pan.dx, transform.pan.dy);
     canvas.scale(transform.scale);  
 
     //draw all existed shapes
     for(int i = 0; i < shapes.length; i++){
-      shapes[i].paint(canvas, paint, pointer[0]);
+      shapes[i].paint(canvas, paint);
     }
-    
-    newShape.paint(canvas, paint, pointer, leaderKeys, activeTool);
 
+    canvas.restore();
+    newShape.paint(canvas, paint, modifierKeys);
   }
 
   @override
   bool shouldRepaint(covariant MasterPainter old) {
     return (old.r1 != r1 || old.r2 != r2 || 
             old.r3 != r3 || old.r4 != r4);    
-  }
-
-  void _setSelectBoxStyle(NewShapeObject property){
-    property.color = Color(0xAAFF0000);
-    property.paintingStyle = PaintingStyle.stroke;
   }
 
 }
