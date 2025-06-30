@@ -52,7 +52,7 @@ class _DefaultPageState extends State<DefaultPage> {
 
 
   Column _window(){
-    print("tool type: ${activeTool.name}");
+    print("main tool type: ${activeTool.name}");
 
     return Column(
     children: [

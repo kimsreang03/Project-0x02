@@ -48,7 +48,9 @@ class ShapeObject{
     paint.strokeCap = strokeCap;
     paint.strokeJoin = strokeJoin;
     //TODO: implement more features here
+
     canvas.drawPath(path, paint);
+
   }
 
   

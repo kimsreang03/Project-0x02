@@ -1,10 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:project_0x02/core/designTools/shape.dart';
 import 'package:project_0x02/core/designTools/tools.dart';
 import 'package:project_0x02/core/shortcuts.dart';
+import 'package:project_0x02/core/utils.dart';
 
 
   // shapes =
@@ -35,9 +37,7 @@ class Transformation{
 /// 
 class CreateCanvas extends StatefulWidget {
   final ToolIndex activeTool;
-  CreateCanvas(this.activeTool, {super.key}){
-    print("0: $activeTool");
-  }
+  const CreateCanvas(this.activeTool, {super.key});
 
   @override
   State<CreateCanvas> createState() => _CreateCanvasState();
@@ -49,16 +49,14 @@ class _CreateCanvasState extends State<CreateCanvas> {
   final NewShapeObject newShape = NewShapeObject();
   final LeaderKeys leaderKeys = LeaderKeys();
   final Transformation transform = Transformation();
-  final List<Offset> pointer = [Offset.zero, Offset.zero];
+  final List<Offset> pointer = [Offset.zero, Offset.zero, Offset.zero];
 
   final FocusNode _focusNode = FocusNode();
   
-  // _CreateCanvasState(){
-  //   activeTool = widget.activeTool;
-  // }
 
   @override
   void initState() {
+    print("hiih");
     super.initState();
     _focusNode.requestFocus();
   }
@@ -160,11 +158,12 @@ class _CreateCanvasState extends State<CreateCanvas> {
     switch(event.buttons){
       case kPrimaryMouseButton:
         setState(() {
-          pointer[0] = (event.localPosition - transform.pan)/transform.scale;
+          pointer[0] = pointer[2] = (event.localPosition - transform.pan)/transform.scale;
+          // print((event.localPosition - transform.pan)/transform.scale);
         });
       break;
       case kMiddleMouseButton:
-        print("middle pressed");
+        print("middle pressed");    
       break;
       case kSecondaryMouseButton:
         print("right pressed");
@@ -187,12 +186,14 @@ class _CreateCanvasState extends State<CreateCanvas> {
           widget.activeTool == ToolIndex.line){
         addNewShape(shapes, newShape);
       }
+      pointer[2] = Offset(-1000, -1000);
       pointer[1] = pointer[0];
     });
 
   } // _onPointerUp
 
   void _onPointerHover(PointerHoverEvent event){
+    
     if(leaderKeys.space){
       setState(() {
         transform.pan += event.localDelta;
@@ -205,8 +206,17 @@ class _CreateCanvasState extends State<CreateCanvas> {
     if(event is PointerScrollEvent){
       if(leaderKeys.ctrl){
         setState(() {
-          transform.scale += event.scrollDelta.dy/200;
-          transform.scale = transform.scale.clamp(0.1, 10);        
+
+          double scaleDelta = event.scrollDelta.dy/530;
+          double ratio = scaleDelta/(transform.scale);
+          transform.scale += scaleDelta;
+          transform.scale = transform.scale.clamp(0.1, 12); 
+          
+          if(0.1 < transform.scale && transform.scale < 12){
+            transform.pan *= ratio + 1;
+            transform.pan -= event.localPosition * ratio;
+          }
+
         });
       }
     }
@@ -226,8 +236,12 @@ class _CreateCanvasState extends State<CreateCanvas> {
 
     setState(() {
       transform.pan += event.localPanDelta;
+      if(leaderKeys.ctrl){
+        print("delta: ${event.localPanDelta/40}");
+      }
 
     });
+
 
   }
 
@@ -240,19 +254,7 @@ class _CreateCanvasState extends State<CreateCanvas> {
 ///////////////////////////////////////
 //////////////////////////////////////
 
-  void addNewShape(List<ShapeObject> shapes, NewShapeObject newShape){
-
-    
-    shapes.add(ShapeObject(
-      pathData: newShape.pathData,
-      color: newShape.color,
-      paintingStyle: newShape.paintingStyle,
-      strokeWidth: newShape.strokeWidth,
-      strokeCap: newShape.strokeCap,
-      strokeJoin: newShape.strokeJoin,
-      strokeStyle: newShape.strokeStyle,
-    ));
-  }
+  
 
 }
 ///////////////////////////
@@ -300,10 +302,29 @@ class MasterPainter extends CustomPainter{
 
     //draw all existed shapes
     for(int i = 0; i < shapes.length; i++){
-      shapes[i].paint(canvas, paint, pointer[0]);
+      shapes[i].paint(canvas, paint, pointer[2]);
     }
     
+    Paint t = Paint();
+    t.color = Colors.red;
+    canvas.drawCircle(Offset(0, 0), 2, t);
+    t.color = Colors.blue;
+    canvas.drawCircle(transform.pan, 2, t);
+
+    // select tool box style
+    if(activeTool == ToolIndex.select){
+      newShape.color = Color(0xAAFF0000);
+      newShape.paintingStyle = PaintingStyle.stroke;
+      newShape.paint(canvas, paint, pointer, leaderKeys, activeTool);
+      newShape.color = Colors.black;
+      newShape.paintingStyle = PaintingStyle.fill;
+      return;
+    }
+
     newShape.paint(canvas, paint, pointer, leaderKeys, activeTool);
+
+
+    
 
   }
 
@@ -311,11 +332,6 @@ class MasterPainter extends CustomPainter{
   bool shouldRepaint(covariant MasterPainter old) {
     return (old.r1 != r1 || old.r2 != r2 || 
             old.r3 != r3 || old.r4 != r4);    
-  }
-
-  void _setSelectBoxStyle(NewShapeObject property){
-    property.color = Color(0xAAFF0000);
-    property.paintingStyle = PaintingStyle.stroke;
   }
 
 }

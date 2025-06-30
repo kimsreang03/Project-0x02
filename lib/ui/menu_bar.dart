@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_0x02/core/manu_bar.dart';
-import '../utils/color_theme.dart';
+import '../config/color_theme.dart';
 
 
 
