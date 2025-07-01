@@ -6,9 +6,7 @@ import 'package:project_0x02/core/shortcuts.dart';
 enum StrokeStyle {solid, dash, ovalDash}
 
 
-
 /// ObjectShape is the class contains all drawing shape
-/// subclass: LineShape, RectShape, 
 class ShapeObject{
 
   Path path = Path();
@@ -57,6 +55,11 @@ class ShapeObject{
 
 }
 
+
+/// this class is only used in the drawing new shapes process
+/// if the shape is already drawn into the canvas
+/// and need some transformation or changes, 
+/// this class has no capibility of doing so
 class NewShapeObject{
 
   String pathData;
@@ -138,7 +141,7 @@ class NewShapeObject{
     }
 
 
-  }
+  } // _gerBasicPath
 
   
 

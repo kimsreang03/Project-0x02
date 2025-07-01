@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -56,7 +54,6 @@ class _CreateCanvasState extends State<CreateCanvas> {
 
   @override
   void initState() {
-    print("hiih");
     super.initState();
     _focusNode.requestFocus();
   }
@@ -69,6 +66,7 @@ class _CreateCanvasState extends State<CreateCanvas> {
 
   @override
   Widget build(BuildContext context) {
+
     Container canvas = Container(
       width: double.infinity,
       height: double.infinity,
@@ -159,7 +157,6 @@ class _CreateCanvasState extends State<CreateCanvas> {
       case kPrimaryMouseButton:
         setState(() {
           pointer[0] = pointer[2] = (event.localPosition - transform.pan)/transform.scale;
-          // print((event.localPosition - transform.pan)/transform.scale);
         });
       break;
       case kMiddleMouseButton:
@@ -203,7 +200,9 @@ class _CreateCanvasState extends State<CreateCanvas> {
   } // _onPointerHover
 
   void _onPointerSignal(PointerSignalEvent event){
+    
     if(event is PointerScrollEvent){
+      
       if(leaderKeys.ctrl){
         setState(() {
 
@@ -216,10 +215,11 @@ class _CreateCanvasState extends State<CreateCanvas> {
             transform.pan *= ratio + 1;
             transform.pan -= event.localPosition * ratio;
           }
-
         });
       }
+
     }
+
   } // _onPointerSignal
 
 /////////////////////////////
@@ -256,25 +256,26 @@ class _CreateCanvasState extends State<CreateCanvas> {
 
   
 
-}
+} // _CreateCanvasState
 ///////////////////////////
  
 
 
 
 
-/// Main painer class
+/// Main paitner class
 
 class MasterPainter extends CustomPainter{
 
 
   List<Offset> pointer;
   List<ShapeObject> shapes;
-  NewShapeObject newShape;/// painting data
+  NewShapeObject newShape;
   Transformation transform;
   LeaderKeys leaderKeys;
   ToolIndex activeTool;
 
+  // these are for tracking the changes of the canvas
   Offset? r1, r2;
   double? r3;
   bool? r4;
@@ -296,21 +297,17 @@ class MasterPainter extends CustomPainter{
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint();
-
+    
+    // panning and zooming
     canvas.translate(transform.pan.dx, transform.pan.dy);
     canvas.scale(transform.scale);  
 
-    //draw all existed shapes
+    // draw all existed shapes
     for(int i = 0; i < shapes.length; i++){
       shapes[i].paint(canvas, paint, pointer[2]);
     }
     
-    Paint t = Paint();
-    t.color = Colors.red;
-    canvas.drawCircle(Offset(0, 0), 2, t);
-    t.color = Colors.blue;
-    canvas.drawCircle(transform.pan, 2, t);
-
+    
     // select tool box style
     if(activeTool == ToolIndex.select){
       newShape.color = Color(0xAAFF0000);
@@ -320,11 +317,8 @@ class MasterPainter extends CustomPainter{
       newShape.paintingStyle = PaintingStyle.fill;
       return;
     }
-
-    newShape.paint(canvas, paint, pointer, leaderKeys, activeTool);
-
-
     
+    newShape.paint(canvas, paint, pointer, leaderKeys, activeTool);
 
   }
 
@@ -333,8 +327,8 @@ class MasterPainter extends CustomPainter{
     return (old.r1 != r1 || old.r2 != r2 || 
             old.r3 != r3 || old.r4 != r4);    
   }
-
-}
+ 
+} // MasterPainter
 
 
 

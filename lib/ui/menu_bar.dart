@@ -3,7 +3,6 @@ import 'package:project_0x02/core/manu_bar.dart';
 import '../config/color_theme.dart';
 
 
-
 class _SubButton{
   String label;
   VoidCallback onPressed;

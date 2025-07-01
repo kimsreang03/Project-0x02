@@ -34,7 +34,7 @@ class ObjectNode extends Node{
   final NodeType type = NodeType.object;
 
   
-
+  // TODO: need implementation
   ObjectNode(super.name, super.boundingBox);
   
   
@@ -52,29 +52,29 @@ class GroupNode extends Node{
 
   GroupNode(super.name, super.boundingBox, [List<Node>? children]){
     if(children != null) {
-
       for(int i = 0; i < children.length; i++) {
         children[i].parentId = id;
       }
-
       _children = children;
     }
-  }
+  } // constructor
 
+
+  // can be removed
   List<Node> getChildrens(){
     return _children;
   }
 
   bool _isNameDuplicated(Node newChild){
 
-
+    // directly comparing string
     for(Node node in _children){
       if(newChild.type != node.type) continue;
       if(newChild.name == node.name) return true;
     }
 
     return false;
-  }
+  } // isNameDuplicated
    
   
   void add(Node child){
@@ -91,7 +91,7 @@ class GroupNode extends Node{
     child.parentId = id;
     _children.add(child);
     
-  }
+  } // add
 
 
 
@@ -120,7 +120,7 @@ class GroupNode extends Node{
       add(child);
     }
     
-  }
+  } // insert
 
 
 
@@ -133,7 +133,7 @@ class GroupNode extends Node{
       _children[i].index -= 1;
     }
 
-  }
+  } // remove
 
 
 
@@ -153,7 +153,7 @@ class GroupNode extends Node{
       _children[i].index = i;
     }
   
-  }
+  } // moveChildIndex
 
 
 
@@ -169,7 +169,7 @@ class GroupNode extends Node{
     remove(child);
     group.insert(index, child);
 
-  }
+  } // moveChildGroup
   
   
   

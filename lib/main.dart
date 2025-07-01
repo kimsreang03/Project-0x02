@@ -15,12 +15,9 @@ class MainApp extends StatelessWidget {
       
       home: Scaffold(
         backgroundColor: Colors.white,
-        
-        
-        body: DefaultPage(),
+        body: MainPage(),
 
-        
-        
+
       ),
     );
   }

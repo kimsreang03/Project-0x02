@@ -1,32 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:project_0x02/core/designTools/tools.dart';
 import 'package:project_0x02/core/shortcuts.dart';
-import 'package:project_0x02/ui/menu_bar.dart';
 import 'package:project_0x02/core/canvas.dart';
+import 'package:project_0x02/ui/menu_bar.dart';
 
 
 
-
-class DefaultPage extends StatefulWidget {
-  const DefaultPage({super.key});
+class MainPage extends StatefulWidget {
+  const MainPage({super.key});
 
   @override
-  State<DefaultPage> createState() => _DefaultPageState();
+  State<MainPage> createState() => _MainPageState();
 }
 
-class _DefaultPageState extends State<DefaultPage> {
+class _MainPageState extends State<MainPage> {
 
-  
-
-  
   late final Map<Type, Action<Intent>> actionsMap;
   ToolIndex activeTool = ToolIndex.select;
 
   @override
   void initState() {
-  
-
     super.initState();
+    
     actionsMap = buildActionsMap((index){
       setState(() => activeTool = index);
     });
@@ -44,9 +39,9 @@ class _DefaultPageState extends State<DefaultPage> {
           autofocus: true,
           child: _window()
         ),
-      )
-,
+      ),
     );
+
   }
 
 
@@ -55,21 +50,21 @@ class _DefaultPageState extends State<DefaultPage> {
     print("main tool type: ${activeTool.name}");
 
     return Column(
-    children: [
+      children: [
+        
+        Align(  
+          alignment: Alignment.centerLeft,
+          child: CreateMenuBar(),
+        ),
+        
+        Expanded(
+          child: CreateCanvas(activeTool),
+        )
+      ], 
       
-      Align(  
-        alignment: Alignment.centerLeft,
-        child: CreateMenuBar(),
-      ),
-      
-      Expanded(
-        child: CreateCanvas(activeTool),
-      )
-    ],
-  );
+    );
+
   }
 
   
-  
-
 }
