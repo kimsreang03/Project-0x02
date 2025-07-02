@@ -118,6 +118,25 @@ class NewShapeObject{
   // }
 
   String _getBasicPath(Offset p1, Offset p2, ToolIndex tool){
+
+    switch(tool){
+      case ToolIndex.line:
+        paintingStyle = PaintingStyle.stroke;
+        return  _getLinePath(p1, p2);
+      case ToolIndex.rect: case ToolIndex.select:
+        return _getRectPath(p1, p2);
+      case ToolIndex.elilipse:
+        print(_getEllipsePath(p1, p2));
+        return _getEllipsePath(p1, p2);
+      default: return "";
+    }
+
+
+
+
+  } // _gerBasicPath
+
+  String _getLinePath(Offset p1, Offset p2){
     double x1, x2, y1, y2;
 
     if(_drawFromCenter){
@@ -130,19 +149,49 @@ class NewShapeObject{
       x2 = p2.dx; y2 = p2.dy;
     }
 
+    return 'M $x1 $y1 L $x2 $y2';
+  } // _getLinePath
 
-    switch(tool){
-      case ToolIndex.line:
-        paintingStyle = PaintingStyle.stroke;
-        return  'M $x1 $y1 L $x2 $y2';
-      case ToolIndex.rect: case ToolIndex.select:
-        return 'M $x1 $y1 H $x2 V $y2 H $x1 Z';
-      default: return "";
+  String _getRectPath(Offset p1, Offset p2){
+    double x1, x2, y1, y2;
+
+    if(_drawFromCenter){
+      x1 = 2*p1.dx - p2.dx;
+      y1 = 2*p1.dy - p2.dy;
+      x2 = p2.dx;
+      y2 = p2.dy;    
+    }else{
+      x1 = p1.dx; y1 = p1.dy; 
+      x2 = p2.dx; y2 = p2.dy;
     }
 
+    return 'M $x1 $y1 H $x2 V $y2 H $x1 Z';
+  } // _getRectPath
+  
 
-  } // _gerBasicPath
+  String _getEllipsePath(Offset p1, Offset p2){
+    double rx, ry;
+    double x1, x2, Y;
 
+    if(_drawFromCenter){
+      rx = p2.dx - p1.dx;
+      ry = p2.dy - p1.dy;
+      x1 = p1.dx - rx;
+      x2 = p2.dx;
+      Y = p1.dy;
+    }else{
+      rx = (p2.dx - p1.dx)/2;
+      ry = (p2.dy - p1.dy)/2;
+      x1 = p1.dx;
+      x2 = p2.dx;
+      Y = (p1.dy + p2.dy)/2;
+
+    }
+
+    return 'M $x1 $Y '
+           'A $rx $ry 0 1 0 $x2 $Y '
+           'A $rx $ry 0 1 0 $x1 $Y ';
+  } // _getEllipsePath
   
 
 }

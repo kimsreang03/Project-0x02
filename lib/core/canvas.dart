@@ -180,7 +180,8 @@ class _CreateCanvasState extends State<CreateCanvas> {
   void _onPointerUp(PointerUpEvent event){
     setState((){
       if (widget.activeTool == ToolIndex.rect ||
-          widget.activeTool == ToolIndex.line){
+          widget.activeTool == ToolIndex.line ||
+          widget.activeTool == ToolIndex.elilipse){
         addNewShape(shapes, newShape);
       }
       pointer[2] = Offset(-1000, -1000);
